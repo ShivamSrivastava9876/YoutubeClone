@@ -1,25 +1,62 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { children, useEffect, useState } from 'react'
+import { Container } from 'react-bootstrap'
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+import Header from './Components/Header/Header'
+import Sidebar from './Components/Sidebar/Sidebar'
+import HomeScreen from './Screens/HomeScreen/HomeScreen'
+import LoginScreen from './Screens/LoginScreen/LoginScreen'
+import SearchScreen from './Screens/searchScreen'
+import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom'
+
+import './_app.scss'
+import { useSelector } from 'react-redux'
+import WatchScreen from './Screens/WatchScreen/WatchScreen'
+import SubscriptionsScreen from './Screens/SubscriptionsScreen/SubscriptionsScreen'
+
+const Layout = ({ children }) => {
+
+   const [sidebar, toggleSidebar] = useState(false)
+
+   const handleToggleSidebar = () => toggleSidebar(value => !value)
+
+   return (
+      <>
+         <Header handleToggleSidebar={handleToggleSidebar} />
+         <div className="app__container">
+            <Sidebar
+               sidebar={sidebar}
+               handleToggleSidebar={handleToggleSidebar}
+            />
+            <Container fluid className="app__main ">
+               {children}
+            </Container>
+         </div>
+      </>
+   )
 }
 
-export default App;
+const App = () => {
+
+   const { accessToken, loading } = useSelector((state) => state.authentication);
+
+   const navigate = useNavigate();
+
+   useEffect(() => {
+      if (!loading && !accessToken) {
+         navigate('/auth')
+      }
+   }, [accessToken, loading, navigate]);
+
+   return (
+      <Routes>
+         <Route path='/' element={<Layout><HomeScreen /></Layout>} />
+         <Route path='/auth' element={<LoginScreen />} />
+         <Route path='/search/:query' element={<Layout><SearchScreen /></Layout>} />
+         <Route path='/watch/:id' element={<Layout><WatchScreen /></Layout>} />
+         <Route path='/feed/subscriptions' element={<Layout><SubscriptionsScreen/></Layout>} />
+         <Route path='*' element={<Navigate to='/' />} />
+      </Routes>
+   )
+}
+
+export default App
