@@ -12,7 +12,7 @@ export const authUser = createAsyncThunk(
     'authentication/requestStatus',
     async (_, { dispatch }) => {
         const provider = await new GoogleAuthProvider();
-        provider.addScope("https://www.googleapis.com/auth/youtube.force-ssl");
+        // provider.addScope("https://www.googleapis.com/auth/youtube.force-ssl");
         return (
             signInWithPopup(auth, provider)
                 .then((result) => {
